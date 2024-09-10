@@ -1,0 +1,9 @@
+README.md
+setup.cfg
+setup.py
+scripts/sentinel_mrhat_cam.sh
+sentinel_mrhat_cam/sentinel_mrhat_cam.egg-info/PKG-INFO
+sentinel_mrhat_cam/sentinel_mrhat_cam.egg-info/SOURCES.txt
+sentinel_mrhat_cam/sentinel_mrhat_cam.egg-info/dependency_links.txt
+sentinel_mrhat_cam/sentinel_mrhat_cam.egg-info/requires.txt
+sentinel_mrhat_cam/sentinel_mrhat_cam.egg-info/top_level.txt

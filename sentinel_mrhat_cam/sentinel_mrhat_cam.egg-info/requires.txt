@@ -1,0 +1,8 @@
+pytest
+PyYAML>=6.0
+pillow
+pytz
+paho-mqtt
+numpy
+pybase64
+pdocs

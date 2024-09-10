@@ -1,0 +1,14 @@
+Metadata-Version: 2.1
+Name: sentinel_mrhat_cam
+Version: 0.3.3
+Summary: Testing python code for Starling detection project
+Author: Ferenc Nandor Janky, Attila Gombos, Nyiri Levente, Nyitrai Bence
+Author-email: info@effective-range.com
+Requires-Dist: pytest
+Requires-Dist: PyYAML>=6.0
+Requires-Dist: pillow
+Requires-Dist: pytz
+Requires-Dist: paho-mqtt
+Requires-Dist: numpy
+Requires-Dist: pybase64
+Requires-Dist: pdocs
