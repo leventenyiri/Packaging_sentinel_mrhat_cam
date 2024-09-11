@@ -8,12 +8,10 @@ setup(
     author_email='info@effective-range.com',
     packages=find_packages(),
     scripts=['scripts/sentinel_mrhat_cam.sh', 'scripts/daemon.sh'],
-    install_requires=['pytest',
-                      'PyYAML>=6.0',
+    install_requires=['PyYAML>=6.0',
                       'pillow',
                       'pytz',
                       'paho-mqtt',
                       'numpy',
-                      'pybase64',
-                      'pdocs']
+                      'pybase64']
 )
