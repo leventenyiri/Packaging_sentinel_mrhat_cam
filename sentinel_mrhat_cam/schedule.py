@@ -7,11 +7,11 @@ import pytz
 
 
 class Schedule:
-    def __init__(self, period):
+    def __init__(self, period: float):
         self.period = period
         self.time_offset = 2  # Budapest is UTC+2
 
-    def should_shutdown(self, waiting_time) -> bool:
+    def should_shutdown(self, waiting_time: float) -> bool:
         """
         Determine if the system should shut down based on the waiting time.
 
@@ -38,11 +38,11 @@ class Schedule:
         ----------
         waiting_time : float
             The time difference between the period and the runtime of the script.
-        end_time : datetime
+        current_time : datetime
             The time the transmission ended. Basically, the current time.
         """
         shutdown_duration = self.calculate_shutdown_duration(waiting_time)
-        wake_time = self.get_wake_time(current_time, shutdown_duration)
+        wake_time = self.get_wake_time(shutdown_duration).isoformat()
 
         logging.info(f"Shutting down for {shutdown_duration} seconds")
         try:
@@ -51,7 +51,7 @@ class Schedule:
         except Exception as e:
             logging.error(f"Failed to schedule wake-up: {e}")
 
-    def calculate_shutdown_duration(self, waiting_time) -> float:
+    def calculate_shutdown_duration(self, waiting_time: float) -> float:
         """
         Calculate the duration for which the system should be shut down.
 
@@ -68,14 +68,12 @@ class Schedule:
         shutdown_duration = waiting_time - TIME_TO_BOOT_AND_SHUTDOWN
         return max(shutdown_duration, 0)
 
-    def get_wake_time(self, shutdown_duration) -> datetime:
+    def get_wake_time(self, shutdown_duration: float) -> datetime:
         """
         Calculate the time at which the system should wake up.
 
         Parameters
         ----------
-        current_time : datetime
-            The current time.
         shutdown_duration : float
             The duration for which the system will be shut down.
 
@@ -93,13 +91,13 @@ class Schedule:
 
         return current_time + timedelta(seconds=shutdown_duration)
 
-    def adjust_time(self, time_str):
+    def adjust_time(self, timestamp: str) -> str:
         """Adjust the given UTC time string to local time."""
-        hours, minutes, seconds = map(int, time_str.split(':'))
+        hours, minutes, seconds = map(int, timestamp.split(':'))
         hours = (hours + self.time_offset) % 24
         return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
 
-    def working_time_check(self, wakeUpTime, shutDownTime) -> None:
+    def working_time_check(self, wake_up_timestamp: str, shut_down_timestamp: str) -> None:
         """
         Check if the current time is within the operational hours defined in the configuration.
 
@@ -108,18 +106,18 @@ class Schedule:
 
         Parameters
         ----------
-        wakeUpTime : str
+        wake_up_timestamp : str
             The wake-up time in "HH:MM:SS" format.
-        shutDownTime : str
+        shut_down_timestamp : str
             The shutdown time in "HH:MM:SS" format.
         """
-        wake_up_time: time = datetime.strptime(wakeUpTime, "%H:%M:%S").time()
-        shut_down_time: time = datetime.strptime(shutDownTime, "%H:%M:%S").time()
+        wake_up_time: time = datetime.strptime(wake_up_timestamp, "%H:%M:%S").time()
+        shut_down_time: time = datetime.strptime(shut_down_timestamp, "%H:%M:%S").time()
 
         utc_time: datetime = datetime.fromisoformat(RTC.get_time())
         current_time: time = utc_time.time()
 
-        local_wake_up_time = self.adjust_time(wakeUpTime)
+        local_wake_up_time = self.adjust_time(wake_up_timestamp)
 
         logging.info(
             f"wake up time is : {wake_up_time}, shutdown time is : {shut_down_time}, current time is : {current_time}"

@@ -1,6 +1,8 @@
 import logging
 import json
 import re
+from typing import Any
+
 from .mqtt import MQTT
 from .static_config import CONFIGACKTOPIC, MINIMUM_WAIT_TIME, MAXIMUM_WAIT_TIME
 
@@ -94,7 +96,7 @@ class Config:
             raise
 
     @staticmethod
-    def get_default_config() -> dict:
+    def get_default_config() -> dict[str, Any]:
         """
         Defines and returns a default configuration dictionary.
 
@@ -108,12 +110,12 @@ class Config:
             "mode": "periodic",
             "period": 15,
             "wakeUpTime": "06:59:31",
-            "shutDownTime": "22:00:00"
+            "shutDownTime": "22:00:00",
         }
         return default_config
 
     @staticmethod
-    def validate_config(new_config) -> None:
+    def validate_config(new_config: dict[str, Any]) -> None:
         """
         Validates the new configuration dictionary against the default configuration
         and checks if specific rules are fulfilled.
@@ -123,7 +125,7 @@ class Config:
 
         Parameters
         ----------
-        new_config : any
+        new_config : dict
             The configuration dictionary to be validated.
 
         Raises
@@ -156,13 +158,13 @@ class Config:
         Config.validate_time_format(new_config)
 
     @staticmethod
-    def validate_period(period) -> None:
+    def validate_period(period: int) -> None:
         """
         Validates the period value in the new configuration dictionary.
 
         Parameters
         ----------
-        period : any
+        period : int
             The time period to be validated.
 
         Raises
@@ -181,7 +183,7 @@ class Config:
             raise ValueError("Period specified in the config is more than the maximum allowed wait time.")
 
     @staticmethod
-    def validate_time_format(new_config: dict) -> None:
+    def validate_time_format(new_config: dict[str, Any]) -> None:
         """
         Validates the wake-up and shut-down time formats in the new configuration dictionary.
 
