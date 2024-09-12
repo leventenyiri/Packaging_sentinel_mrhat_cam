@@ -2,11 +2,11 @@ import os
 import logging
 
 # Configuration file paths
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-LOG_CONFIG_PATH = os.path.join(SCRIPT_DIR, 'log_config.yaml')
-CONFIG_PATH = os.path.join(SCRIPT_DIR, 'config.json')
-TEMP_CONFIG_PATH = os.path.join(SCRIPT_DIR, 'temp_config.json')
-STATE_FILE_PATH = os.path.join(SCRIPT_DIR, 'state_file.json')
+CONFIG_DIR = '/etc/sentinel_mrhat_cam'
+LOG_CONFIG_PATH = os.path.join(CONFIG_DIR, 'log_config.yaml')
+CONFIG_PATH = os.path.join(CONFIG_DIR, 'config.json')
+TEMP_CONFIG_PATH = os.path.join(CONFIG_DIR, 'temp_config.json')
+STATE_FILE_PATH = os.path.join(CONFIG_DIR, 'state_file.json')
 
 # MQTT Configuration
 """ BROKER = "192.168.0.105"

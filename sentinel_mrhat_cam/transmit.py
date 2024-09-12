@@ -1,7 +1,7 @@
 import logging
 import json
 import io
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, Optional
 from PIL import Image
 import pybase64
 from datetime import datetime
@@ -75,7 +75,7 @@ class Transmit:
         logging.info(f"charger_voltage_now: {hardware_info['charger_voltage_now']}")
         logging.info(f"charger_current_now: {hardware_info['charger_current_now']}")
 
-    def create_base64_image(self, image_array: np.ndarray) -> str:
+    def create_base64_image(self, image_array: Optional[np.ndarray[bool, Any]]) -> str:
         """
         Converts a numpy array representing an image into a base64-encoded JPEG string.
 
@@ -120,7 +120,7 @@ class Transmit:
         return pybase64.b64encode(image_data).decode("utf-8")
 
     @log_execution_time("Creating the json message")
-    def create_message(self, image_array: np.ndarray, timestamp: str) -> str:
+    def create_message(self, image_array: Optional[np.ndarray[bool, Any]], timestamp: str) -> str:
         """
         Creates a JSON message containing image data, timestamp, CPU temperature,
         battery temperature, and battery charge percentage.
@@ -151,18 +151,21 @@ class Transmit:
         - This method is decorated with `@log_execution_time`, which logs the time taken to execute the method.
         """
         try:
-            battery_info: Dict[str, Any] = System.get_battery_info()
-            hardware_info: Dict[str, Any] = System.gather_hardware_info()
+            battery_info = System.get_battery_info()
+            hardware_info = System.gather_hardware_info()
             cpu_temp: float = System.get_cpu_temperature()
 
             logging.info(
-                f"Battery temp: {battery_info['temperature']}°C, percentage: {battery_info['percentage']} %, CPU temp: {cpu_temp}°C")
+                f"Battery temp: {battery_info['temperature']}°C, "
+                f"percentage: {battery_info['percentage']} %, "
+                f"CPU temp: {cpu_temp}°C"
+            )
             message: Dict[str, Any] = {
                 "timestamp": timestamp,
                 "image": self.create_base64_image(image_array),
                 "cpuTemp": cpu_temp,
                 "batteryTemp": battery_info["temperature"],
-                "batteryCharge": battery_info["percentage"]
+                "batteryCharge": battery_info["percentage"],
             }
 
             # Log hardware info to a file for further analysis
@@ -194,9 +197,9 @@ class Transmit:
             A JSON string containing the image data, timestamp, CPU temperature, battery temperature,
             and battery charge percentage as a string.
         """
-        image_raw: np.ndarray = self.camera.capture()
-        timestamp: str = RTC.get_time()
-        message: str = self.create_message(image_raw, timestamp)
+        image_raw = self.camera.capture()
+        timestamp = RTC.get_time()
+        message = self.create_message(image_raw, timestamp)
         return message
 
     @log_execution_time("Taking a picture and sending it")
@@ -239,7 +242,7 @@ class Transmit:
             logging.error(f"Error in run method: {e}")
             raise
 
-    def transmit_message_with_time_measure(self) -> Tuple[float, datetime]:
+    def transmit_message_with_time_measure(self) -> float:
         """
         Run the `transmit_message` method while timing how long it takes to complete.
         The total elapsed time is then used to calculate how long the system should wait
@@ -247,18 +250,19 @@ class Transmit:
 
         Returns
         -------
-        Tuple[float, datetime]
-            - float: The waiting time (in seconds) until the next execution, which
+        float
+            The waiting time (in seconds) until the next execution, which
             is the `period` minus the elapsed time.
-            - datetime: The ending time of the transmiting process, represented as a datetime object.
         """
         try:
             start_time: str = RTC.get_time()
             self.transmit_message()
             end_time: str = RTC.get_time()
-            elapsed_time: float = (datetime.fromisoformat(end_time) -
-                                   datetime.fromisoformat(start_time)).total_seconds()
-            waiting_time: float = self.schedule.period - elapsed_time
+            elapsed_time: float = (
+                datetime.fromisoformat(end_time) - datetime.fromisoformat(start_time)
+            ).total_seconds()
+            waiting_time = self.schedule.period - elapsed_time
+            return max(waiting_time, MINIMUM_WAIT_TIME)
         except Exception as e:
             logging.error(f"Error in run_with_time_measure method: {e}")
-        return max(waiting_time, MINIMUM_WAIT_TIME)
+            raise e

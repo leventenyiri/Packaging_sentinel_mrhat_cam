@@ -1,5 +1,7 @@
 import logging
 import logging.config
+from typing import Any
+
 import yaml
 import os
 import threading
@@ -50,8 +52,8 @@ class Logger(logging.Handler):
         """
         super().__init__()
         self.filepath = filepath
-        self.log_queue = Queue()
-        self.mqtt = None
+        self.log_queue: Queue[str] = Queue()
+        self.mqtt: Any = None
         self.start_event = threading.Event()
         self.pool = ThreadPool(processes=5)
 
@@ -77,7 +79,7 @@ class Logger(logging.Handler):
             self.create_mqtt_handler()
             logging.info("Logging started")
 
-        except Exception as e:
+        except Exception:
             exit(1)
 
     def create_mqtt_handler(self) -> None:
@@ -89,8 +91,7 @@ class Logger(logging.Handler):
         """
         self.setLevel(LOG_LEVEL)
         formatter = logging.Formatter(
-            fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-            datefmt='%Y-%m-%d %H:%M:%S'
+            fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S'
         )
         self.setFormatter(formatter)
         logging.getLogger().addHandler(self)
@@ -103,6 +104,7 @@ class Logger(logging.Handler):
         broker, and signals that MQTT logging has started.
         """
         from .mqtt import MQTT
+
         self.mqtt = MQTT()
         self.mqtt.connect()
         self.start_event.set()

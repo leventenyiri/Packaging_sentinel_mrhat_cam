@@ -1,6 +1,13 @@
-from .app import App
-from .logger import Logger
-from .static_config import LOG_CONFIG_PATH, CONFIG_PATH
+#!/usr/bin/env python3
+
+import shutil
+from os import makedirs
+from os.path import dirname, exists, isdir, join
+from pathlib import Path
+
+from sentinel_mrhat_cam.app import App
+from sentinel_mrhat_cam.logger import Logger
+from sentinel_mrhat_cam.static_config import LOG_CONFIG_PATH, CONFIG_PATH, CONFIG_DIR
 import logging
 import sys
 
@@ -34,6 +41,9 @@ def main():
     It sets up all necessary components and manages the main execution flow.
     """
 
+    # Setting up the configuration directory and copying the default configuration files if necessary
+    _set_up_configuration()
+
     # Configuring and starting the logging
     logger = Logger(LOG_CONFIG_PATH)
     logger.start_logging()
@@ -59,6 +69,36 @@ def main():
     finally:
         app.mqtt.disconnect()
         logger.disconnect_mqtt()
+
+
+def _set_up_configuration():
+    """
+    Set up the configuration directory and copy the default configuration files if necessary.
+
+    This function creates the configuration directory if it does not exist and copies the default
+    configuration files to the configuration directory if they do not exist. Will not overwrite existing files.
+
+    Notes
+    -----
+    This function is called before the main function to ensure that the configuration files are
+    available before the application starts.
+    """
+
+    # Setting the default configuration path
+    default_config_dir = str(Path(dirname(__file__)).parent.absolute().joinpath('config'))
+
+    # Ensuring configuration directory exists
+    if not isdir(CONFIG_DIR):
+        makedirs(dirname(CONFIG_DIR), exist_ok=True)
+
+    # Copying the default configuration files to the config directory, if they do not exist
+    if not exists(LOG_CONFIG_PATH):
+        default_log_config = join(default_config_dir, 'log_config.yaml')
+        shutil.copy(default_log_config, LOG_CONFIG_PATH)
+
+    if not exists(CONFIG_PATH):
+        default_config = join(default_config_dir, 'config.json')
+        shutil.copy(default_config, CONFIG_PATH)
 
 
 if __name__ == "__main__":

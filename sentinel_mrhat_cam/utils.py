@@ -1,12 +1,15 @@
 import time
 import logging
 from functools import wraps
+from typing import Optional, Any, TypeVar, Callable, cast
+
+F = TypeVar('F', bound=Callable[..., Any])
 
 
-def log_execution_time(operation_name=None):
-    def decorator(func):
+def log_execution_time(operation_name: Optional[str] = None) -> Callable[[F], F]:
+    def decorator(func: F) -> F:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
             start_time = time.perf_counter()
             result = func(*args, **kwargs)
             end_time = time.perf_counter()
@@ -19,5 +22,7 @@ def log_execution_time(operation_name=None):
 
             logging.info(log_message)
             return result
-        return wrapper
+
+        return cast(F, wrapper)
+
     return decorator

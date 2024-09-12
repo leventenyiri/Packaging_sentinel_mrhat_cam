@@ -1,11 +1,17 @@
 import logging
 import time
 import shutil
-from .static_config import BROKER, CONFIGSUBTOPIC, PORT, QOS, TEMP_CONFIG_PATH, CONFIG_PATH, USERNAME, PASSWORD
+from typing import Any
+
 try:
     from paho.mqtt import client as mqtt_client
+    from paho.mqtt import enums as mqtt_enums
 except ImportError:
-    mqtt_client = None
+    mqtt_client = None  # type: ignore
+    mqtt_enums = None  # type: ignore
+
+from .static_config import BROKER, CONFIGSUBTOPIC, PORT, QOS, TEMP_CONFIG_PATH, CONFIG_PATH, USERNAME, PASSWORD
+
 import json
 import socket
 import threading
@@ -30,7 +36,7 @@ class MQTT:
         The Quality of Service level for MQTT messages.
     client : mqtt_client.Client
         The MQTT client instance.
-    reconnect_counter : int
+    broker_connect_counter : int
         A counter to track reconnection attempts.
     config_received_event : threading.Event
         An event to signal when a new configuration is received.
@@ -44,12 +50,12 @@ class MQTT:
     - The class uses configuration values from a `static_config` module, which should be present in the same package.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.broker = BROKER
         self.subtopic = CONFIGSUBTOPIC
         self.port = PORT
         self.qos = QOS
-        self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
+        self.client = mqtt_client.Client(mqtt_enums.CallbackAPIVersion.VERSION2)
         self.broker_connect_counter = 0
         self.config_received_event = threading.Event()
         self.config_confirm_message = "config-nok|Confirm message uninitialized"
@@ -70,11 +76,13 @@ class MQTT:
         configuration path, and a confirmation message is set. If an error occurs, an appropriate
         error message is set.
         """
-        def on_message(client, userdata, msg):
+
+        def on_message(client: Any, userdata: Any, message: Any) -> None:
             from .app_config import Config
+
             try:
                 # Parse the JSON message
-                config_data = json.loads(msg.payload)
+                config_data = json.loads(message.payload)
                 Config.validate_config(config_data)
 
                 # Write the validated JSON to the temp file
@@ -98,7 +106,7 @@ class MQTT:
         self.client.on_message = on_message
         self.client.subscribe(self.subtopic)
 
-    def connect(self):
+    def connect(self) -> Any:
         """
         Connect to the MQTT broker.
 
@@ -111,11 +119,18 @@ class MQTT:
             The connected MQTT client instance.
         """
         try:
-            def on_connect(client, userdata, flags, rc, properties=None):
-                if rc == 0:
+
+            def on_connect(
+                client: Any,
+                userdata: Any,
+                flags: Any,
+                reason_code: Any,
+                properties: Any,
+            ) -> None:
+                if reason_code == 0:
                     logging.info("Connected to MQTT Broker!")
                 else:
-                    logging.error(f"Failed to connect, return code {rc}")
+                    logging.error(f"Failed to connect, return code {reason_code}")
 
             # Making sure we can reach the broker before trying to connect
             self.broker_check()
@@ -215,7 +230,7 @@ class MQTT:
             logging.error(f"Error during creating connection: {e}")
             exit(1)
 
-    def publish(self, message, topic) -> None:
+    def publish(self, message: str, topic: str) -> None:
         """
         Publishes a message to a specified MQTT topic.
 
@@ -251,7 +266,7 @@ class MQTT:
         except Exception:
             exit(1)
 
-    def disconnect(self):
+    def disconnect(self) -> None:
         """
         Disconnect the MQTT client from the broker.
 
