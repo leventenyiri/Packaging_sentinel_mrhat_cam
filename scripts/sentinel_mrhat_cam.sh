@@ -15,7 +15,7 @@ while true; do
     start_time=$(date +%s)
     echo "Starting Python script at $(date)"
     # Run the Python script
-    python3 sentinel_mrhat_cam_main.py
+    python3 /usr/local/bin/sentinel_mrhat_cam_main.py
     EXIT_CODE=$?
     
     end_time=$(date +%s)
