@@ -31,6 +31,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcap-dev
       - name: Verify changes
         uses: EffectiveRange/python-verify-github-action@v1
         with:
@@ -54,7 +58,8 @@ jobs:
         with:
           use-devcontainer: 'true'
           container-config: 'amd64-container'
-          debian-dist-type: 'fpm-deb'
+          debian-dist-command: 'sudo apt-get install -y libcap-dev && pack_python . --all'
           install-packaging-tools: 'false'
+          add-wheel-dist: 'false'
       - name: Release
         uses: EffectiveRange/version-release-github-action@v1
