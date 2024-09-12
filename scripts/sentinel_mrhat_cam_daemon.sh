@@ -11,7 +11,7 @@ Description=Run Script Daemon
 [Service]
 Type=simple
 User=admin
-ExecStart=/bin/bash /home/admin/sentinel_mrhat_cam.sh
+ExecStart=/bin/bash /usr/local/bin/sentinel_mrhat_cam.sh
 Restart=on-failure
 RestartSec=5
 
