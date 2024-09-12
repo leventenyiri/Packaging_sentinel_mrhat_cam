@@ -1,4 +1,6 @@
+from typing import Optional, Any
 from unittest.mock import MagicMock
+
 try:
     from libcamera import controls
     from picamera2 import Picamera2
@@ -32,7 +34,7 @@ class Camera:
         The height of the captured image based on the quality setting.
     """
 
-    def __init__(self, config):
+    def __init__(self, config: dict[str, str]) -> None:
         """
         Initializes the Camera class with the given configuration.
 
@@ -84,7 +86,7 @@ class Camera:
         self.cam.start(show_preview=False)
 
     @log_execution_time("Image capture time:")
-    def capture(self) -> np.ndarray:
+    def capture(self) -> Optional[np.ndarray[bool, Any]]:
         """
         Captures an image from the camera and returns it as numpy array.
 
@@ -94,7 +96,7 @@ class Camera:
             The captured image as a numpy array.
         """
         try:
-            image = self.cam.capture_array()
+            image: np.ndarray[bool, Any] = self.cam.capture_array()
         except Exception as e:
             logging.error(f"Error during image capture: {e}")
             return None

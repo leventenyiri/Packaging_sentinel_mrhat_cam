@@ -1,9 +1,10 @@
 import subprocess
 import logging
 from datetime import datetime
-from typing import List
+from typing import List, Union, Any
 import pytz
 import time
+
 try:
     from gpiozero import CPUTemperature
 except ImportError:
@@ -29,24 +30,24 @@ class System:
     """
 
     @staticmethod
-    def shutdown():
+    def shutdown() -> None:
         logging.info("Pi has been shut down")
         subprocess.run(['sudo', 'shutdown', '-h', 'now'])
 
     @staticmethod
-    def reboot():
+    def reboot() -> None:
         logging.info("System will be rebooted")
         subprocess.run(['sudo', 'reboot'], check=True)
 
     # Still experimental, don't have the real API yet.
     @staticmethod
-    def schedule_wakeup(wake_time):
+    def schedule_wakeup(wake_time: Union[str, int, float]) -> None:
         """
         Schedule a system wake-up at a specified time.
 
         Parameters
         ----------
-        wake_time : datetime
+        wake_time : str, int, float
             The time at which the system should wake up.
 
         Raises
@@ -69,7 +70,7 @@ class System:
                 raise ValueError("wake_time must be a str, int, or float")
 
             # Execute the command
-            result = subprocess.run(cmd, shell=True, check=True, capture_output=True, text=True)
+            subprocess.run(cmd, shell=True, check=True, capture_output=True, text=True)
 
         except subprocess.CalledProcessError as e:
             logging.error(f"Failed to set RTC wake-up alarm: {e}")
@@ -77,7 +78,7 @@ class System:
             raise
 
     @staticmethod
-    def get_cpu_temperature():
+    def get_cpu_temperature() -> float:
         """
         Get the current CPU temperature.
 
@@ -87,10 +88,10 @@ class System:
             The current CPU temperature in degrees Celsius.
         """
         cpu = CPUTemperature()
-        return cpu.temperature
+        return cpu.temperature  # type: ignore
 
     @staticmethod
-    def get_battery_info():
+    def get_battery_info() -> dict[str, Any]:
         """
         Get information about the battery status.
 
@@ -132,14 +133,14 @@ class System:
         """
         try:
             # Battery info is path dependant!!!!
-            result = subprocess.run(['upower', '-i', '/org/freedesktop/UPower/devices/battery_bq2562x_battery'],
-                                    stdout=subprocess.PIPE, check=True)
+            result = subprocess.run(
+                ['upower', '-i', '/org/freedesktop/UPower/devices/battery_bq2562x_battery'],
+                stdout=subprocess.PIPE,
+                check=True,
+            )
             info = result.stdout.decode('utf-8')
 
-            battery_info = {
-                'temperature': None,
-                'percentage': None
-            }
+            battery_info: dict[str, Any] = {'temperature': None, 'percentage': None}
 
             for line in info.splitlines():
                 if "temperature:" in line:
@@ -154,7 +155,7 @@ class System:
             exit(1)
 
     @staticmethod
-    def gather_hardware_info():
+    def gather_hardware_info() -> Union[dict[str, Any], None]:
         """
         Collect comprehensive hardware information about the system.
 
@@ -214,15 +215,13 @@ class System:
         try:
             # Get battery info
             battery_result = subprocess.run(
-                ['cat', '/sys/class/power_supply/bq2562x-battery/uevent'],
-                stdout=subprocess.PIPE, check=True
+                ['cat', '/sys/class/power_supply/bq2562x-battery/uevent'], stdout=subprocess.PIPE, check=True
             )
             battery_info = battery_result.stdout.decode('utf-8')
 
             # Get charger info
             charger_result = subprocess.run(
-                ['cat', '/sys/class/power_supply/bq2562x-charger/uevent'],
-                stdout=subprocess.PIPE, check=True
+                ['cat', '/sys/class/power_supply/bq2562x-charger/uevent'], stdout=subprocess.PIPE, check=True
             )
             charger_info = charger_result.stdout.decode('utf-8')
 
@@ -261,6 +260,7 @@ class RTC:
     syncing the RTC with the system time, and retrieving the current time.
 
     """
+
     @staticmethod
     def sync_RTC_to_system() -> None:
         """
@@ -287,7 +287,7 @@ class RTC:
             logging.error(f"Error syncing RTC: {e}")
 
     @staticmethod
-    def sync_system_to_ntp(max_retries=5, delay=2) -> bool:
+    def sync_system_to_ntp(max_retries: int = 5, delay: int = 2) -> bool:
         """
         Synchronize the system clock to NTP server.
 
@@ -333,7 +333,7 @@ class RTC:
         exit(1)
 
     @staticmethod
-    def convert_timestamp(timestamp_str) -> str:
+    def convert_timestamp(timestamp: str) -> str:
         """
         Convert a timestamp string to ISO 8601 format.
 
@@ -343,7 +343,7 @@ class RTC:
 
         Parameters
         ----------
-        timestamp_str : str
+        timestamp : str
             The timestamp string to convert. Expected format is:
             "Day YYYY-MM-DD HH:MM:SS [UTC]", e.g., "Mon 2023-08-14 15:30:45 UTC".
 
@@ -371,15 +371,15 @@ class RTC:
         """
         try:
             # Remove the 'UTC' part if it exists
-            parts = timestamp_str.split()
+            parts = timestamp.split()
             # if the last element is 'UTC' remove it
             if parts[-1] == 'UTC':
-                timestamp_str = ' '.join(parts[:-1])
+                timestamp = ' '.join(parts[:-1])
             # Parse the timestamp while ignoring the weekday and timezone
-            timestamp = datetime.strptime(timestamp_str, "%a %Y-%m-%d %H:%M:%S")
+            parsed_time = datetime.strptime(timestamp, "%a %Y-%m-%d %H:%M:%S")
             # Localize to UTC
-            timestamp = pytz.UTC.localize(timestamp, None)
-            return timestamp.isoformat()
+            utc_time = pytz.UTC.localize(parsed_time, None)
+            return utc_time.isoformat()  # type: ignore
         except Exception as e:
             logging.error(f"Error parsing timestamp: {e}")
             exit(1)
@@ -414,7 +414,7 @@ class RTC:
         return result.stdout.splitlines()
 
     @staticmethod
-    def find_line(lines, target_string) -> str:
+    def find_line(lines: list[str], target_string: str) -> str:
         """
         Find and return a specific line from `timedatectl` output.
 
