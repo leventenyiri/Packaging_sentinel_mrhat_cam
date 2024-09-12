@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# Set the working directory
-cd /home/admin
-
-# Ensure the correct Python environment is used
-export PATH="/usr/local/bin:$PATH"
-
 # Configuration
 RESTART_COUNT_FILE="/tmp/restart_count"
 
@@ -21,7 +15,7 @@ while true; do
     start_time=$(date +%s)
     echo "Starting Python script at $(date)"
     # Run the Python script
-    python3 -m sentinel_mrhat_cam.main
+    python3 sentinel_mrhat_cam_main.py
     EXIT_CODE=$?
     
     end_time=$(date +%s)

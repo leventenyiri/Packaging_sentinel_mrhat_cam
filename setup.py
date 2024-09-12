@@ -7,11 +7,7 @@ setup(
     author='Ferenc Nandor Janky, Attila Gombos, Nyiri Levente, Nyitrai Bence',
     author_email='info@effective-range.com',
     packages=find_packages(),
-    scripts=['scripts/sentinel_mrhat_cam.sh', 'scripts/daemon.sh'],
-    install_requires=['PyYAML>=6.0',
-                      'pillow',
-                      'pytz',
-                      'paho-mqtt',
-                      'numpy',
-                      'pybase64']
+    scripts=['scripts/sentinel_mrhat_cam.sh', 'scripts/sentinel_mrhat_cam_main.py'],
+    data_files=[('config', ['config/config.json', 'config/log_config.yaml'])],
+    install_requires=['PyYAML>=6.0', 'pillow', 'pytz', 'paho-mqtt', 'numpy', 'pybase64'],
 )

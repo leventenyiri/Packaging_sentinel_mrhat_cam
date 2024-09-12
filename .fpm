@@ -11,3 +11,6 @@
 --depends python3-tz
 --python-disable-dependency pybase64
 --depends python3-unpaddedbase64
+--deb-systemd service/sentinel_mrhat_cam.service
+--deb-systemd-enable
+--deb-systemd-auto-start
