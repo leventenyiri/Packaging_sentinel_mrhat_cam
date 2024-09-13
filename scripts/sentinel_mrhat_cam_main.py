@@ -89,7 +89,7 @@ def _set_up_configuration():
 
     # Ensuring configuration directory exists
     if not isdir(CONFIG_DIR):
-        makedirs(dirname(CONFIG_DIR), exist_ok=True)
+        makedirs(CONFIG_DIR, exist_ok=True)
 
     # Copying the default configuration files to the config directory, if they do not exist
     if not exists(LOG_CONFIG_PATH):

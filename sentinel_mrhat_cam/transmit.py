@@ -3,7 +3,7 @@ import json
 import io
 from typing import Dict, Any, Optional
 from PIL import Image
-import pybase64
+import base64
 from datetime import datetime
 import numpy as np
 from .utils import log_execution_time
@@ -75,7 +75,7 @@ class Transmit:
         logging.info(f"charger_voltage_now: {hardware_info['charger_voltage_now']}")
         logging.info(f"charger_current_now: {hardware_info['charger_current_now']}")
 
-    def create_base64_image(self, image_array: Optional[np.ndarray[bool, Any]]) -> str:
+    def create_base64_image(self, image_array: Optional[np.ndarray]) -> str:  # type: ignore
         """
         Converts a numpy array representing an image into a base64-encoded JPEG string.
 
@@ -104,7 +104,7 @@ class Transmit:
         Notes
         -----
         - If the provided image array is `None`, then there was an error with the camera during the
-        image capture proccess. Since the connection to the MQTT broker is not established yet,
+        image capture process. Since the connection to the MQTT broker is not established yet,
         the image capturing function will provide `None` as the return value.
         This way we can log the error through MQTT when it connects.
         """
@@ -117,10 +117,10 @@ class Transmit:
         image.save(image_bytes, format="JPEG")
         image_data: bytes = image_bytes.getvalue()
 
-        return pybase64.b64encode(image_data).decode("utf-8")
+        return base64.b64encode(image_data).decode("utf-8")
 
     @log_execution_time("Creating the json message")
-    def create_message(self, image_array: Optional[np.ndarray[bool, Any]], timestamp: str) -> str:
+    def create_message(self, image_array: Optional[np.ndarray], timestamp: str) -> str:  # type: ignore
         """
         Creates a JSON message containing image data, timestamp, CPU temperature,
         battery temperature, and battery charge percentage.
