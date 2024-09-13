@@ -1,4 +1,4 @@
-from typing import Optional, Any
+from typing import Optional
 from unittest.mock import MagicMock
 
 try:
@@ -86,7 +86,7 @@ class Camera:
         self.cam.start(show_preview=False)
 
     @log_execution_time("Image capture time:")
-    def capture(self) -> Optional[np.ndarray[bool, Any]]:
+    def capture(self) -> Optional[np.ndarray]:  # type: ignore
         """
         Captures an image from the camera and returns it as numpy array.
 
@@ -96,8 +96,8 @@ class Camera:
             The captured image as a numpy array.
         """
         try:
-            image: np.ndarray[bool, Any] = self.cam.capture_array()
+            image = self.cam.capture_array()
         except Exception as e:
             logging.error(f"Error during image capture: {e}")
             return None
-        return image
+        return image  # type: ignore
