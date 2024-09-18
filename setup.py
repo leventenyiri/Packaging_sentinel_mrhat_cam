@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='sentinel_mrhat_cam',
-    version='1.1.5',
+    version='1.1.6',
     description='Testing python code for Starling detection project',
     author='Ferenc Nandor Janky, Attila Gombos, Nyiri Levente, Nyitrai Bence',
     author_email='info@effective-range.com',
