@@ -162,7 +162,7 @@ By default the script is running automatically as soon as the device has booted 
 If you dont want the script to start on boot, then you have to disable the daemon responsible for that.
 
 ```bash
-sudo systemctl disable sentinel_mrhat_cam.service
+sudo systemctl disable sentinel-mrhat-cam.service
 
 sudo reboot
 ```
@@ -170,7 +170,7 @@ sudo reboot
 To make it start on boot:
 
 ```bash
-sudo systemctl enable sentinel_mrhat_cam.service
+sudo systemctl enable sentinel-mrhat-cam.service
 
 sudo reboot
 ```
@@ -205,7 +205,7 @@ Each device will have a unique name and topic for receiving the config. E.g: for
 
 **Subscribe topic:** `config/er-edge`
 
-The defaul config.json message:
+The defaul sentinel_app_config.json message:
 
 ```json
 {
@@ -224,7 +224,7 @@ The defaul config.json message:
 
 `config-ok` OR `config-nok|{error desc}`
 
-- Once a `config.json` file is sent to the device, a message will be sent back to this topic.
+- Once a `sentinel_app_config.json` file is sent to the device, a message will be sent back to this topic.
 - If everything was fine, it will send a `config-ok` message.
 - If something went wrong it will send a `config-nok` followed by the description of the problem.
 

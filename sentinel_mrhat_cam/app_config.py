@@ -56,7 +56,7 @@ class Config:
 
     def load(self) -> None:
         """
-        Load the configuration from the `config.json` file.
+        Load the configuration from the `sentinel_app_config.json` file.
 
         If the file is successfully opened and read, the configuration
         data is validated and stored in the `data` attribute of the Config instance.

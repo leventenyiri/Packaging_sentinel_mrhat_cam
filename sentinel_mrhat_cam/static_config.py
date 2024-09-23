@@ -2,9 +2,9 @@ import os
 import logging
 
 # Configuration file paths
-CONFIG_DIR = '/etc/sentinel_mrhat_cam'
-LOG_CONFIG_PATH = os.path.join(CONFIG_DIR, 'log_config.yaml')
-CONFIG_PATH = os.path.join(CONFIG_DIR, 'config.json')
+CONFIG_DIR = '/etc/sentinel-mrhat-cam'
+LOG_CONFIG_PATH = os.path.join(CONFIG_DIR, 'sentinel_log_config.yaml')
+CONFIG_PATH = os.path.join(CONFIG_DIR, 'sentinel_app_config.json')
 TEMP_CONFIG_PATH = os.path.join(CONFIG_DIR, 'temp_config.json')
 STATE_FILE_PATH = os.path.join(CONFIG_DIR, 'state_file.json')
 

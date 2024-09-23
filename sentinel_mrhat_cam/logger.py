@@ -61,7 +61,7 @@ class Logger(logging.Handler):
         """
         Start the logging process.
 
-        This method loads the logging configuration from the `log_config.yaml` file,
+        This method loads the logging configuration from the `sentinel_log_config.yaml` file,
         sets up the logging system, and adds the MQTT handler to the root logger.
 
         Raises
