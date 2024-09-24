@@ -28,7 +28,7 @@ CONFIGSUBTOPIC = "settings/cam4"
 USERNAME = "cam4"
 PASSWORD = "rubin2024cam4"
 LOGGING_TOPIC = "cam4/log"
-LOG_LEVEL = logging.WARNING
+LOG_LEVEL = logging.INFO
 
 # App configuration
 """
